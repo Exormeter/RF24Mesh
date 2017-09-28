@@ -1,4 +1,5 @@
-
+#define FALSE 0
+#define TRUE 1
 
 
 
@@ -133,7 +134,9 @@ for(uint8_t i=0; i<pollCount; i++){
   
   while(millis()-timr<225){
     if( (type = network.update()) == NETWORK_ADDR_NODE_RESPONSE){
+      #if defined (MESH_DEBUG_SERIAL)
       Serial.print("Antwort des DHCP Servers\n");
+      #endif
       i=pollCount;
       break;
     }
@@ -155,10 +158,11 @@ memcpy(&addrResponse,network.frame_buffer, sizeof(addrResponse));
 //This memcpy copies the payload which is the new adress to newAddress
 memcpy(&newAddress,network.frame_buffer+sizeof(RF24NetworkHeader),sizeof(newAddress));
 
+#if defined (MESH_DEBUG_SERIAL)
 Serial.println(addrResponse.toString());
 Serial.println(newAddress);
+#endif
 if(!newAddress){
-  Serial.println("Returned");
   return 0;
 }
 #ifdef MESH_DEBUG_SERIAL
@@ -174,14 +178,15 @@ if(!newAddress){
   printf("Set address 0%o rcvd 0%o\n",mesh_address,addrResponse.from_node);
 #endif
 mesh_address = newAddress;
-Serial.println(mesh_address);
 setNodeID(addrResponse.reserved);
 radio.stopListening();
 delay(10);
 network.begin(mesh_address);
 header.to_node = 00;
 header.type = MESH_ADDR_CONFIRM;
+#if defined (MESH_DEBUG_SERIAL)
 Serial.print("Header send to confirm Address"); Serial.println(header.toString());
+#endif
 while( !network.write(header,0,0) ){
   if(registerAddrCount++ >= 6 ){ 
         network.begin(MESH_DEFAULT_ADDRESS);
