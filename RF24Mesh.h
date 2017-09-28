@@ -21,6 +21,9 @@
 #define MESH_ADDR_CONFIRM 129
 // No Network ACK types
 #define MESH_ADDR_LOOKUP 196
+// Address and new Node ID
+#define NETWORK_ADDR_NODE_RESPONSE 199
+#define DEFAULT_NODE_ID 255
 #define MESH_ADDR_RELEASE 197
 #define MESH_ID_LOOKUP 198
  
@@ -94,6 +97,9 @@ public:
    * @param timeout How long to attempt address renewal in milliseconds default:60000
    */
   bool begin(uint8_t channel = MESH_DEFAULT_CHANNEL, rf24_datarate_e data_rate = RF24_1MBPS, uint32_t timeout=MESH_RENEWAL_TIMEOUT );
+
+
+  bool beginWithDynamicID(uint8_t channel = MESH_DEFAULT_CHANNEL, rf24_datarate_e data_rate = RF24_1MBPS, uint32_t timeout = MESH_RENEWAL_TIMEOUT);
   
   /**
    * Very similar to network.update(), it needs to be called regularly to keep the network
@@ -167,6 +173,8 @@ public:
   * @return Returns the newly assigned RF24Network address
   */
   uint16_t renewAddress(uint32_t timeout=MESH_RENEWAL_TIMEOUT);
+
+  uint16_t renewAddressDynamic(uint32_t timeout = MESH_RENEWAL_TIMEOUT);
   
   /**
    * Releases the currently assigned address lease. Useful for nodes that will be sleeping etc.
@@ -267,6 +275,7 @@ public:
   RF24Network& network;  
   bool findNodes(RF24NetworkHeader& header, uint8_t level, uint16_t *address); /**< Broadcasts to all multicast levels to find available nodes **/
   bool requestAddress(uint8_t level); /**< Actual requesting of the address once a contact node is discovered or supplied **/
+  bool requestAddressDynamic(uint8_t level);
   bool waitForAvailable(uint32_t timeout); /**< Waits for data to become available */
   bool doDHCP; /**< Indicator that an address request is available */
   uint32_t lastSaveTime;

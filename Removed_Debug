@@ -1,0 +1,16 @@
+line 732 
+#if defined (MESH_DEBUG_MINIMAL)
+        #if !defined (__linux) && !defined ARDUINO_SAM_DUE || defined TEENSY || defined(__ARDUINO_X86__)
+          Serial.print("ID: ");Serial.print(addrList[i].nodeID,DEC);Serial.print(" ADDR: ");			
+          uint16_t newAddr = addrList[i].address;
+          char addr[5] = "    ", count=3, mask=7;
+          while(newAddr){
+            addr[count] = (newAddr & mask)+48; //get the individual Octal numbers, specified in chunks of 3 bits, convert to ASCII by adding 48
+            newAddr >>= 3;
+            count--;
+          }
+          Serial.println(addr);
+        #else
+          printf("ID: %d ADDR: 0%o\n", addrList[i].nodeID,addrList[i].address);
+        #endif
+      #endif
